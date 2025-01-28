@@ -1,50 +1,15 @@
-// Test ID: IIDSAT
+import { useLoaderData, LoaderFunctionArgs } from 'react-router-dom';
 
-import {
-  calcMinutesLeft,
-  formatCurrency,
-  formatDate,
-} from "../../utils/helpers";
+import { calcMinutesLeft, formatCurrency, formatDate } from '@/utils/helpers';
+import { getOrder } from '@/services/apiData';
 
-const order = {
-  id: "ABCDEF",
-  status: "Cakajuca",
-  customer: "Oto",
-  phone: "123456789",
-  address: "Arroios, Trenicn , Slovakia",
-  priority: true,
-  estimatedDelivery: "2025-04-25T10:00:00",
-  cart: [
-    {
-      pizzaId: 7,
-      name: "Napoli",
-      quantity: 3,
-      unitPrice: 16,
-      totalPrice: 48,
-    },
-    {
-      pizzaId: 5,
-      name: "Diavola",
-      quantity: 2,
-      unitPrice: 16,
-      totalPrice: 32,
-    },
-  ],
-  position: "-9.000,38.000",
-  orderPrice: 95,
-  priorityPrice: 19,
-};
+import type { Order } from '@/types/OrderTypes';
 
 function Order() {
-  const {
-    id,
-    status,
-    priority,
-    priorityPrice,
-    orderPrice,
-    estimatedDelivery,
-    cart,
-  } = order;
+  const order = useLoaderData();
+
+  const { id, status, priority, priorityPrice, orderPrice, estimatedDelivery, cart } = order;
+
   const deliveryIn = calcMinutesLeft(estimatedDelivery);
 
   return (
@@ -60,24 +25,25 @@ function Order() {
 
       <div>
         <p>
-          {deliveryIn >= 0
-            ? `Zostava len  ${calcMinutesLeft(estimatedDelivery)} minut`
-            : "Objednavka by mala uz prist"}
+          {deliveryIn >= 0 ? `Zostava len  ${calcMinutesLeft(estimatedDelivery)} minut` : 'Objednavka by mala uz prist'}
         </p>
         <p>(Predpokladané doručenie: {formatDate(estimatedDelivery)})</p>
       </div>
 
       <div>
         <p>Cena pizze: {formatCurrency(orderPrice)}</p>
-        {priority && (
-          <p>
-            Cena za uprednostnie objednavky: {formatCurrency(priorityPrice)}
-          </p>
-        )}
+        {priority && <p>Cena za uprednostnie objednavky: {formatCurrency(priorityPrice)}</p>}
         <p>Postovne: {formatCurrency(orderPrice + priorityPrice)}</p>
       </div>
     </div>
   );
 }
 
+export const loader = async ({ params }: LoaderFunctionArgs) => {
+  const order = await getOrder(params.id as string);
+  console.log(order);
+  return order;
+};
+
 export default Order;
+

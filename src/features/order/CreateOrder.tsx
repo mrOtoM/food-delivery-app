@@ -1,20 +1,21 @@
-// https://uibakery.io/regex-library/phone-number
-const isValidPhone = (str) =>
-  /^\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/.test(
-    str
-  );
+import { Form, redirect, ActionFunctionArgs } from 'react-router-dom';
+
+import { createOrder } from '@/services/apiData';
+import { CartItem } from '@/types/OrderTypes';
+
+const isValidPhone = (str) => /^\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/.test(str);
 
 const fakeCart = [
   {
     pizzaId: 12,
-    name: "Polo pizza",
+    name: 'Polo pizza',
     quantity: 2,
     unitPrice: 16,
     totalPrice: 32,
   },
   {
     pizzaId: 6,
-    name: "Vegetarianska pizza",
+    name: 'Vegetarianska pizza',
     quantity: 1,
     unitPrice: 13,
     totalPrice: 13,
@@ -28,7 +29,7 @@ function CreateOrder() {
     <div>
       <h2>Pripravený na objednávku? Poďme na to!</h2>
 
-      <form>
+      <Form method="POST">
         <div>
           <label>Meno</label>
           <input type="text" name="customer" required />
@@ -56,17 +57,32 @@ function CreateOrder() {
             // value={withPriority}
             // onChange={(e) => setWithPriority(e.target.checked)}
           />
-          <label htmlFor="priority">
-            Chcete dať svojej objednávke prioritu?
-          </label>
+          <label htmlFor="priority">Chcete dať svojej objednávke prioritu?</label>
         </div>
 
         <div>
+          <input type="hidden" name="cart" value={JSON.stringify(cart)} />
           <button>Objednať teraz</button>
         </div>
-      </form>
+      </Form>
     </div>
   );
 }
 
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const formData = await request.formData();
+  const data = Object.fromEntries(formData);
+
+  const order = {
+    ...data,
+    cart: JSON.parse(data.cart as string) as CartItem[],
+    priority: data.priority === 'on',
+  };
+
+  const newOrder = await createOrder(order);
+
+  return redirect(`/order/${newOrder.id}`);
+};
+
 export default CreateOrder;
+

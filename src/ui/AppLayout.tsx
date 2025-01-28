@@ -2,12 +2,11 @@ import { Outlet, useNavigation } from "react-router-dom";
 
 import CartOverview from "@/features/cart/CartOverview";
 import Header from "@/ui/Header";
-import Loader from "@/ui/loader";
+import Loader from "@/ui/Loader";
 
 function AppLayout() {
   const navigation = useNavigation();
   const loading = navigation.state === "loading";
-  console.log("navigation", navigation);
 
   return (
     <div className="layout">
