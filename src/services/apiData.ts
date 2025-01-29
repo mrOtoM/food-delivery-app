@@ -7,7 +7,7 @@ const API_URL = '';
 export async function getMenu(): Promise<MenuItemTypes[]> {
   const res = await fetch(`${API_URL}/menu`);
 
-  if (!res.ok) throw Error('Failed getting menu');
+  if (!res.ok) throw Error('Nepodarilo sa ziskat menu');
 
   const { data } = await res.json();
   return data;
@@ -35,7 +35,7 @@ export async function createOrder(newOrder: Order) {
     const { data } = await res.json();
     return data;
   } catch {
-    throw Error('Failed creating your order');
+    throw Error('Zda sa, ze sa vyskytol problem pri vytvarani objednavky');
   }
 }
 

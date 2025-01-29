@@ -1,9 +1,10 @@
-import { Form, redirect, ActionFunctionArgs } from 'react-router-dom';
+import { Form, redirect, ActionFunctionArgs, useNavigation, useActionData } from 'react-router-dom';
 
 import { createOrder } from '@/services/apiData';
-import { CartItem } from '@/types/OrderTypes';
+import { CartItem, Order } from '@/types/OrderTypes';
 
-const isValidPhone = (str) => /^\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/.test(str);
+const isValidPhone = (str: string) =>
+  /^\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/.test(str);
 
 const fakeCart = [
   {
@@ -23,6 +24,10 @@ const fakeCart = [
 ];
 
 function CreateOrder() {
+  const navigation = useNavigation();
+  const formErrors = useActionData();
+
+  const isSubmitting = navigation.state === 'submitting';
   const cart = fakeCart;
 
   return (
@@ -40,6 +45,7 @@ function CreateOrder() {
           <div>
             <input type="tel" name="phone" required />
           </div>
+          {formErrors?.phone && <p>{formErrors.phone}</p>}
         </div>
 
         <div>
@@ -62,7 +68,7 @@ function CreateOrder() {
 
         <div>
           <input type="hidden" name="cart" value={JSON.stringify(cart)} />
-          <button>Objednať teraz</button>
+          <button disabled={isSubmitting}>{isSubmitting ? 'Zadavam objednavku' : 'Objednať teraz'}</button>
         </div>
       </Form>
     </div>
@@ -71,15 +77,25 @@ function CreateOrder() {
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
-  const data = Object.fromEntries(formData);
+  const data = Object.fromEntries(formData) as Order;
 
   const order = {
     ...data,
-    cart: JSON.parse(data.cart as string) as CartItem[],
+    phone: data.phone ?? '',
+    cart: JSON.parse(data.cart as string) ?? [],
     priority: data.priority === 'on',
   };
 
   const newOrder = await createOrder(order);
+
+  const errors = {};
+  if (!isValidPhone(order.phone)) {
+    errors.phone = 'Prosim, zadajte Vase spravne aktualne telefonne cislo';
+  }
+
+  if (Object.keys(errors).length > 0) {
+    return errors;
+  }
 
   return redirect(`/order/${newOrder.id}`);
 };

@@ -1,11 +1,12 @@
 export interface Order {
-  id?: string;
-  customer?: string;
-  status?: 'delivered' | 'pending' | 'processing' | 'cancelled';
+  id: string;
+  phone: string;
+  customer: string;
+  status: 'delivered' | 'pending' | 'processing' | 'cancelled';
   priority: boolean;
   cart: CartItem[];
-  orderPrice?: number;
-  priorityPrice?: number;
+  orderPrice: number;
+  priorityPrice: number;
 }
 
 export interface CartItem {
