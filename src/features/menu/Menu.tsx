@@ -1,8 +1,8 @@
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData } from 'react-router-dom';
 
-import { getMenu } from "@/services/apiData";
-import { MenuItemTypes } from "@/types/MenuTypes";
-import MenuItem from "@/features/menu/MenuItem";
+import { getMenu } from '@/services/apiData';
+import { MenuItemTypes } from '@/types/MenuTypes';
+import MenuItem from '@/features/menu/MenuItem';
 
 function Menu() {
   const menu = useLoaderData() as MenuItemTypes[];
@@ -23,3 +23,4 @@ export async function loader() {
 }
 
 export default Menu;
+

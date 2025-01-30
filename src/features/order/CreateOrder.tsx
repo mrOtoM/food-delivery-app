@@ -2,6 +2,7 @@ import { Form, redirect, ActionFunctionArgs, useNavigation, useActionData } from
 
 import { createOrder } from '@/services/apiData';
 import { CartItem, Order } from '@/types/OrderTypes';
+import Button from '@/ui/Button';
 
 const isValidPhone = (str: string) =>
   /^\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/.test(str);
@@ -37,13 +38,13 @@ function CreateOrder() {
       <Form method="POST">
         <div>
           <label>Meno</label>
-          <input type="text" name="customer" required />
+          <input className="input" type="text" name="customer" required />
         </div>
 
         <div>
           <label>Telefónne číslo</label>
           <div>
-            <input type="tel" name="phone" required />
+            <input className="input" type="tel" name="phone" required />
           </div>
           {formErrors?.phone && <p>{formErrors.phone}</p>}
         </div>
@@ -51,24 +52,25 @@ function CreateOrder() {
         <div>
           <label>Adresa</label>
           <div>
-            <input type="text" name="address" required />
+            <input className="input" type="text" name="address" required />
           </div>
         </div>
 
         <div>
           <input
+            className="h-6 w-6 accent-yellow-400 focus:outline-none focus:ring focus:ring-yellow-400 focus:ring-offset-2"
             type="checkbox"
             name="priority"
             id="priority"
-            // value={withPriority}
-            // onChange={(e) => setWithPriority(e.target.checked)}
           />
           <label htmlFor="priority">Chcete dať svojej objednávke prioritu?</label>
         </div>
 
         <div>
           <input type="hidden" name="cart" value={JSON.stringify(cart)} />
-          <button disabled={isSubmitting}>{isSubmitting ? 'Zadavam objednavku' : 'Objednať teraz'}</button>
+          <Button disabled={isSubmitting}>
+            {isSubmitting ? 'Zadavam objednavku' : 'Objednať teraz'}
+          </Button>
         </div>
       </Form>
     </div>
