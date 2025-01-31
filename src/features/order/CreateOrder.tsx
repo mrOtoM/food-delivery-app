@@ -85,7 +85,8 @@ function CreateOrder() {
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
-  const data = Object.fromEntries(formData) as Order;
+  const data = Object.fromEntries(formData);
+  console.log('data', data);
 
   const order = {
     ...data,
@@ -93,6 +94,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     cart: JSON.parse(data.cart as string) ?? [],
     priority: data.priority === 'on',
   };
+
+  console.log('order', order);
 
   const newOrder = await createOrder(order);
 

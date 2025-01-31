@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
 
 import Button from '@/ui/Button';
 
 function CreateUser() {
   const [username, setUsername] = useState('');
 
-  function handleSubmit(e) {
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
   }
 
@@ -23,7 +23,7 @@ function CreateUser() {
 
       {username !== '' && (
         <div>
-          <Button style="primary">Zacat objednavku</Button>
+          <Button>Zacat objednavku</Button>
         </div>
       )}
     </form>

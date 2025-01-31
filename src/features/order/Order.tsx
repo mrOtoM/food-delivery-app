@@ -7,7 +7,7 @@ import OrderItem from '@/features/order/OrderItem';
 import type { Order } from '@/types/OrderTypes';
 
 function Order() {
-  const order = useLoaderData();
+  const order = useLoaderData<Order>();
 
   const { id, status, priority, priorityPrice, orderPrice, estimatedDelivery, cart } = order;
 

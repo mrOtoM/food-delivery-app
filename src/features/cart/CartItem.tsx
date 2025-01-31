@@ -1,7 +1,13 @@
 import Button from '@/ui/Button';
 import { formatCurrency } from '@/utils/helpers';
 
-function CartItem({ item }) {
+import type { CartItem } from '@/types/OrderTypes';
+
+type CartItemProps = {
+  item: CartItem;
+};
+
+function CartItem({ item }: CartItemProps) {
   const { id, name, quantity, totalPrice } = item;
 
   return (

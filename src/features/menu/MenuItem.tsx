@@ -1,7 +1,13 @@
 import Button from '@/ui/Button';
 import { formatCurrency } from '@/utils/helpers';
 
-function MenuItem({ item }) {
+import type { MenuItemTypes } from '@/types/MenuTypes';
+
+type MenuItemProps = {
+  item: MenuItemTypes;
+};
+
+function MenuItem({ item }: MenuItemProps) {
   const { id, name, unitPrice, ingredients, soldOut, imageUrl } = item;
 
   return (
@@ -16,7 +22,7 @@ function MenuItem({ item }) {
           ) : (
             <p className="text-sm font-medium uppercase text-stone-500">Nedostupne</p>
           )}
-          <Button style="small">Pridat </Button>
+          <Button type="small">Pridat</Button>
         </div>
       </div>
     </li>

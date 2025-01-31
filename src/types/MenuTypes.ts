@@ -1,6 +1,8 @@
 export interface MenuItemTypes {
   id: string;
   name: string;
-  description: string;
-  price: number;
+  unitPrice: number;
+  soldOut: boolean;
+  imageUrl: string;
+  ingredients: string[];
 }
