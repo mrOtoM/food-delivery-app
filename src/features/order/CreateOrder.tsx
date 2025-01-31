@@ -32,31 +32,37 @@ function CreateOrder() {
   const cart = fakeCart;
 
   return (
-    <div>
-      <h2>Pripravený na objednávku? Poďme na to!</h2>
+    <div className="px-4 py-6">
+      <h2 className="mb-8 text-xl font-semibold">Pripravený na objednávku? Poďme na to!</h2>
 
       <Form method="POST">
-        <div>
-          <label>Meno</label>
-          <input className="input" type="text" name="customer" required />
-        </div>
-
-        <div>
-          <label>Telefónne číslo</label>
-          <div>
-            <input className="input" type="tel" name="phone" required />
-          </div>
-          {formErrors?.phone && <p>{formErrors.phone}</p>}
-        </div>
-
-        <div>
-          <label>Adresa</label>
-          <div>
-            <input className="input" type="text" name="address" required />
+        <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center">
+          <label className="sm:basis-40">Meno</label>
+          <div className="grow">
+            <input className="input w-full" type="text" name="customer" required />
           </div>
         </div>
 
-        <div>
+        <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center">
+          <label className="sm:basis-40">Telefónne číslo</label>
+          <div className="grow">
+            <input className="input w-full" type="tel" name="phone" required />
+            {formErrors?.phone && (
+              <p className="mt-2 rounded-md bg-red-100 p-2 text-xs text-red-700">
+                {formErrors.phone}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center">
+          <label className="sm:basis-40">Adresa</label>
+          <div className="grow">
+            <input className="input w-full" type="text" name="address" required />
+          </div>
+        </div>
+
+        <div className="mb-12 flex items-center gap-x-5">
           <input
             className="h-6 w-6 accent-yellow-400 focus:outline-none focus:ring focus:ring-yellow-400 focus:ring-offset-2"
             type="checkbox"
