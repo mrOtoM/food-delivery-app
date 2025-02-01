@@ -6,9 +6,10 @@ type ButtonProps = {
   disabled?: boolean;
   to?: To;
   type?: 'primary' | 'secondary' | 'small';
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
 };
 
-function Button({ children, disabled, to, type = 'primary' }: ButtonProps) {
+function Button({ children, disabled, to, type = 'primary', onClick }: ButtonProps) {
   const base =
     'focus: inline-block text-sm rounded-full bg-yellow-400  font-semibold uppercase tracking-wide text-stone-800 outline-none transition-colors duration-300 hover:bg-yellow-300 focus:ring focus:ring-yellow-300 focus:ring-offset-2 disabled:cursor-not-allowed';
 
@@ -24,6 +25,14 @@ function Button({ children, disabled, to, type = 'primary' }: ButtonProps) {
       <Link to={to} className={styles[type]}>
         {children}
       </Link>
+    );
+  }
+
+  if (onClick) {
+    return (
+      <button onClick={onClick} disabled={disabled} className={styles[type]}>
+        {children}
+      </button>
     );
   }
 

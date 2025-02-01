@@ -3,6 +3,7 @@ import { Form, redirect, ActionFunctionArgs, useNavigation, useActionData } from
 import { createOrder } from '@/services/apiData';
 import { CartItem, Order } from '@/types/OrderTypes';
 import Button from '@/ui/Button';
+import { useAppSelector } from '@/store/hooks';
 
 const isValidPhone = (str: string) =>
   /^\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/.test(str);
@@ -27,6 +28,7 @@ const fakeCart = [
 function CreateOrder() {
   const navigation = useNavigation();
   const formErrors = useActionData();
+  const username = useAppSelector((state) => state.user.username);
 
   const isSubmitting = navigation.state === 'submitting';
   const cart = fakeCart;
@@ -34,12 +36,19 @@ function CreateOrder() {
   return (
     <div className="px-4 py-6">
       <h2 className="mb-8 text-xl font-semibold">Pripravený na objednávku? Poďme na to!</h2>
+      <p> {username}</p>
 
       <Form method="POST">
         <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center">
           <label className="sm:basis-40">Meno</label>
           <div className="grow">
-            <input className="input w-full" type="text" name="customer" required />
+            <input
+              className="input w-full"
+              type="text"
+              name="customer"
+              defaultValue={username}
+              required
+            />
           </div>
         </div>
 

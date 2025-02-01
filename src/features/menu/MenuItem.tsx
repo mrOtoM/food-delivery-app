@@ -1,6 +1,9 @@
 import Button from '@/ui/Button';
 import { formatCurrency } from '@/utils/helpers';
 
+import { useAppDispatch } from '@/store/hooks';
+import { addItem } from '@/features/cart/cartSlice';
+
 import type { MenuItemTypes } from '@/types/MenuTypes';
 
 type MenuItemProps = {
@@ -9,6 +12,19 @@ type MenuItemProps = {
 
 function MenuItem({ item }: MenuItemProps) {
   const { id, name, unitPrice, ingredients, soldOut, imageUrl } = item;
+  const dispatch = useAppDispatch();
+
+  const handleAddToCart = () => {
+    const newItem = {
+      id: id,
+      name,
+      quantity: 1,
+      unitPrice,
+      totalPrice: unitPrice * 1,
+    };
+
+    dispatch(addItem(newItem));
+  };
 
   return (
     <li className="flex gap-4 py-2">
@@ -22,7 +38,11 @@ function MenuItem({ item }: MenuItemProps) {
           ) : (
             <p className="text-sm font-medium uppercase text-stone-500">Nedostupne</p>
           )}
-          <Button type="small">Pridat</Button>
+          {!soldOut && (
+            <Button type="small" onClick={handleAddToCart}>
+              Pridat
+            </Button>
+          )}
         </div>
       </div>
     </li>
