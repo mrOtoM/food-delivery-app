@@ -1,35 +1,19 @@
 import Button from '@/ui/Button';
 import LinkButton from '@/ui/LinkButton';
-import CartItem from './CartItem';
-import { useAppSelector } from '@/store/hooks';
-
-const fakeCart = [
-  {
-    id: 12,
-    name: 'Polo pizza',
-    quantity: 2,
-    unitPrice: 16,
-    totalPrice: 32,
-  },
-  {
-    id: 6,
-    name: 'Zeleninova pizza',
-    quantity: 1,
-    unitPrice: 13,
-    totalPrice: 13,
-  },
-  {
-    id: 11,
-    name: 'Spenatova pizza',
-    quantity: 1,
-    unitPrice: 15,
-    totalPrice: 15,
-  },
-];
+import CartItem from '@/features/cart/CartItem';
+import { clearCart, getCart } from '@/features/cart/cartSlice';
+import { getUsername } from '@/features/user/userSlice';
+import EmptyCart from '@/features/cart/EmptyCart';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 
 function Cart() {
-  const cart = fakeCart;
-  const username = useAppSelector((state) => state.user.username);
+  const username = useAppSelector(getUsername);
+  const currentCart = useAppSelector(getCart);
+  const dispatch = useAppDispatch();
+
+  if (!currentCart.length) {
+    return <EmptyCart />;
+  }
 
   return (
     <div className="px-4 py-3">
@@ -38,14 +22,16 @@ function Cart() {
       <h2 className="mt-7 text-xl font-semibold">Tvoja karta, {username}</h2>
 
       <ul className="mt-3 divide-y divide-stone-200 border-b">
-        {cart.map((item) => (
+        {currentCart.map((item) => (
           <CartItem item={item} key={item.id} />
         ))}
       </ul>
 
       <div className="mt-6 space-x-2">
-        <Button to="/order/new">Objednaj pizzu</Button>
-        <Button type="secondary">Vycistit kartu</Button>
+        <Button to="/order/new">Zavazne objednat</Button>
+        <Button type="secondary" onClick={() => dispatch(clearCart())}>
+          Vycistit kartu
+        </Button>
       </div>
     </div>
   );

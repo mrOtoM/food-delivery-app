@@ -1,8 +1,8 @@
 import Button from '@/ui/Button';
 import { formatCurrency } from '@/utils/helpers';
-
-import { useAppDispatch } from '@/store/hooks';
-import { addItem } from '@/features/cart/cartSlice';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { addItem, getCurrentQuantityById } from '@/features/cart/cartSlice';
+import DeleteItem from '@/features/cart/DeleteItem';
 
 import type { MenuItemTypes } from '@/types/MenuTypes';
 
@@ -13,6 +13,8 @@ type MenuItemProps = {
 function MenuItem({ item }: MenuItemProps) {
   const { id, name, unitPrice, ingredients, soldOut, imageUrl } = item;
   const dispatch = useAppDispatch();
+  const currentQuantity = useAppSelector(getCurrentQuantityById(id));
+  const isInCart = currentQuantity > 0;
 
   const handleAddToCart = () => {
     const newItem = {
@@ -38,7 +40,10 @@ function MenuItem({ item }: MenuItemProps) {
           ) : (
             <p className="text-sm font-medium uppercase text-stone-500">Nedostupne</p>
           )}
-          {!soldOut && (
+
+          {isInCart && <DeleteItem id={id} />}
+
+          {!soldOut && !isInCart && (
             <Button type="small" onClick={handleAddToCart}>
               Pridat
             </Button>

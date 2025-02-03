@@ -2,7 +2,6 @@ import { useAppSelector } from '@/store/hooks';
 
 function Username() {
   const username = useAppSelector((state) => state.user.username);
-  console.log('username', username);
 
   if (!username) {
     return '';
