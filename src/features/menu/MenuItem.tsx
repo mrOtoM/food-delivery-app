@@ -3,6 +3,7 @@ import { formatCurrency } from '@/utils/helpers';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { addItem, getCurrentQuantityById } from '@/features/cart/cartSlice';
 import DeleteItem from '@/features/cart/DeleteItem';
+import UpdateItemQuantity from '../cart/UpdateItemQuantity';
 
 import type { MenuItemTypes } from '@/types/MenuTypes';
 
@@ -12,8 +13,8 @@ type MenuItemProps = {
 
 function MenuItem({ item }: MenuItemProps) {
   const { id, name, unitPrice, ingredients, soldOut, imageUrl } = item;
-  const dispatch = useAppDispatch();
   const currentQuantity = useAppSelector(getCurrentQuantityById(id));
+  const dispatch = useAppDispatch();
   const isInCart = currentQuantity > 0;
 
   const handleAddToCart = () => {
@@ -41,7 +42,12 @@ function MenuItem({ item }: MenuItemProps) {
             <p className="text-sm font-medium uppercase text-stone-500">Nedostupne</p>
           )}
 
-          {isInCart && <DeleteItem id={id} />}
+          {isInCart && (
+            <div className="flex gap-x-2">
+              <UpdateItemQuantity id={id} currentQuantity={currentQuantity} />
+              <DeleteItem id={id} />
+            </div>
+          )}
 
           {!soldOut && !isInCart && (
             <Button type="small" onClick={handleAddToCart}>

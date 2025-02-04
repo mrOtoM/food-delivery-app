@@ -5,7 +5,7 @@ type ButtonProps = {
   children: React.ReactNode;
   disabled?: boolean;
   to?: To;
-  type?: 'primary' | 'secondary' | 'small';
+  type?: 'primary' | 'secondary' | 'small' | 'rounded';
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
 };
 
@@ -18,6 +18,7 @@ function Button({ children, disabled, to, type = 'primary', onClick }: ButtonPro
     small: base + ' py-2 md:px-5 md:py-2.5 px-4 text-xs',
     secondary:
       'focus: inline-block text-sm rounded-full bg-transparent border-2 border-stone-300  font-semibold uppercase tracking-wide text-stone-400 outline-none transition-colors duration-300 hover:bg-stone-300 hover:text-stone-600 focus:ring focus:ring-stone-200 focus:ring-offset-2 disabled:cursor-not-allowed px-4 py-2.5 sm:px-6 sm:py-4 md:py-3.5',
+    rounded: base + ' py-1 md:px-3.5 md:py-2.5 px-2 text-xs',
   };
 
   if (to) {

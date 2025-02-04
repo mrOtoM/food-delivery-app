@@ -1,37 +1,35 @@
 import { Form, redirect, ActionFunctionArgs, useNavigation, useActionData } from 'react-router-dom';
+import { useState } from 'react';
 
 import { createOrder } from '@/services/apiData';
-import { CartItem, Order } from '@/types/OrderTypes';
 import Button from '@/ui/Button';
 import { useAppSelector } from '@/store/hooks';
+import { clearCart, getCart, getTotalCartPrice } from '@/features/cart/cartSlice';
+import EmptyCart from '@/features/cart/EmptyCart';
+import { getUsername } from '@/features/user/userSlice';
+import store from '@/store/store';
+import { formatCurrency } from '@/utils/helpers';
+
+import type { CartItem } from '@/types/OrderTypes';
 
 const isValidPhone = (str: string) =>
   /^\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/.test(str);
 
-const fakeCart = [
-  {
-    pizzaId: 12,
-    name: 'Polo pizza',
-    quantity: 2,
-    unitPrice: 16,
-    totalPrice: 32,
-  },
-  {
-    pizzaId: 6,
-    name: 'Vegetarianska pizza',
-    quantity: 1,
-    unitPrice: 13,
-    totalPrice: 13,
-  },
-];
-
 function CreateOrder() {
+  const [withPriority, setWithPriority] = useState(false);
   const navigation = useNavigation();
   const formErrors = useActionData();
-  const username = useAppSelector((state) => state.user.username);
+  const username = useAppSelector(getUsername);
+  const cart = useAppSelector(getCart);
+  const totalCardPrice = useAppSelector(getTotalCartPrice);
+  const priorityPrice = withPriority ? totalCardPrice * 0.2 : 0;
+  const totalPrice = totalCardPrice + priorityPrice;
 
   const isSubmitting = navigation.state === 'submitting';
-  const cart = fakeCart;
+
+  if (!cart.length) {
+    return <EmptyCart />;
+  }
 
   return (
     <div className="px-4 py-6">
@@ -77,6 +75,8 @@ function CreateOrder() {
             type="checkbox"
             name="priority"
             id="priority"
+            checked={withPriority}
+            onChange={(e) => setWithPriority(e.target.checked)}
           />
           <label htmlFor="priority">Chcete dať svojej objednávke prioritu?</label>
         </div>
@@ -84,7 +84,9 @@ function CreateOrder() {
         <div>
           <input type="hidden" name="cart" value={JSON.stringify(cart)} />
           <Button disabled={isSubmitting}>
-            {isSubmitting ? 'Zadavam objednavku' : 'Objednať teraz'}
+            {isSubmitting
+              ? 'Zadavam objednavku'
+              : `Objednať teraz za ${formatCurrency(totalPrice)}`}
           </Button>
         </div>
       </Form>
@@ -95,20 +97,23 @@ function CreateOrder() {
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const data = Object.fromEntries(formData);
-  console.log('data', data);
 
   const order = {
-    ...data,
-    phone: data.phone ?? '',
-    cart: JSON.parse(data.cart as string) ?? [],
+    customer: data.customer as string,
+    address: data.address as string,
+    phone: data.phone as string,
+    cart: JSON.parse(data.cart as string).map((item: CartItem) => ({
+      ...item,
+      pizzaId: item.id,
+    })),
     priority: data.priority === 'on',
   };
 
-  console.log('order', order);
-
   const newOrder = await createOrder(order);
 
-  const errors = {};
+  store.dispatch(clearCart());
+
+  const errors: Record<string, string> = {};
   if (!isValidPhone(order.phone)) {
     errors.phone = 'Prosim, zadajte Vase spravne aktualne telefonne cislo';
   }

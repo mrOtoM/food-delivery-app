@@ -1,5 +1,5 @@
 export interface Order {
-  id: string;
+  id: number;
   phone: string;
   customer: string;
   status: 'delivered' | 'pending' | 'processing' | 'cancelled';
@@ -19,8 +19,8 @@ export interface NewOrder {
 }
 
 export interface CartItem {
-  name: string;
   id: number;
+  name: string;
   quantity: number;
   unitPrice: number;
   totalPrice: number;

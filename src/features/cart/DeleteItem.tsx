@@ -2,7 +2,7 @@ import { useAppDispatch } from '@/store/hooks';
 import Button from '@/ui/Button';
 import { deleteItem } from '@/features/cart/cartSlice';
 
-function DeleteItem({ id }) {
+function DeleteItem({ id }: { id: number }) {
   const dispatch = useAppDispatch();
 
   return (
