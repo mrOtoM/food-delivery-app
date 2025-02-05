@@ -3,10 +3,10 @@ import { useState } from 'react';
 
 import { createOrder } from '@/services/apiData';
 import Button from '@/ui/Button';
-import { useAppSelector } from '@/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { clearCart, getCart, getTotalCartPrice } from '@/features/cart/cartSlice';
 import EmptyCart from '@/features/cart/EmptyCart';
-import { getUsername } from '@/features/user/userSlice';
+import { fetchAddress } from '@/features/user/userSlice';
 import store from '@/store/store';
 import { formatCurrency } from '@/utils/helpers';
 
@@ -17,15 +17,23 @@ const isValidPhone = (str: string) =>
 
 function CreateOrder() {
   const [withPriority, setWithPriority] = useState(false);
+  const dispatch = useAppDispatch();
   const navigation = useNavigation();
   const formErrors = useActionData();
-  const username = useAppSelector(getUsername);
+
   const cart = useAppSelector(getCart);
   const totalCardPrice = useAppSelector(getTotalCartPrice);
   const priorityPrice = withPriority ? totalCardPrice * 0.2 : 0;
   const totalPrice = totalCardPrice + priorityPrice;
-
   const isSubmitting = navigation.state === 'submitting';
+  const {
+    username,
+    status: addressStatus,
+    position,
+    address,
+    error: errorAddress,
+  } = useAppSelector((state) => state.user);
+  const isLoadingAdress = addressStatus === 'loading';
 
   if (!cart.length) {
     return <EmptyCart />;
@@ -62,11 +70,35 @@ function CreateOrder() {
           </div>
         </div>
 
-        <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="relative mb-5 flex flex-col gap-2 sm:flex-row sm:items-center">
           <label className="sm:basis-40">Adresa</label>
           <div className="grow">
-            <input className="input w-full" type="text" name="address" required />
+            <input
+              className="input w-full"
+              type="text"
+              name="address"
+              disabled={isLoadingAdress}
+              defaultValue={address}
+              required
+            />
+            {addressStatus === 'error' && (
+              <p className="mt-2 rounded-md bg-red-100 p-2 text-xs text-red-700">{errorAddress}</p>
+            )}
           </div>
+          <span className="absolute right-1 top-[5px] z-50">
+            {!position.latitude && !position.longitude && (
+              <Button
+                disabled={isLoadingAdress}
+                type="small"
+                onClick={(e) => {
+                  e.preventDefault();
+                  dispatch(fetchAddress());
+                }}
+              >
+                Najdi poziciu
+              </Button>
+            )}
+          </span>
         </div>
 
         <div className="mb-12 flex items-center gap-x-5">
@@ -83,7 +115,16 @@ function CreateOrder() {
 
         <div>
           <input type="hidden" name="cart" value={JSON.stringify(cart)} />
-          <Button disabled={isSubmitting}>
+          <input
+            type="hidden"
+            name="position"
+            value={
+              position.longitude && position.latitude
+                ? `${position.latitude}, ${position.longitude}`
+                : ''
+            }
+          />
+          <Button disabled={isSubmitting || isLoadingAdress}>
             {isSubmitting
               ? 'Zadavam objednavku'
               : `Objednať teraz za ${formatCurrency(totalPrice)}`}
@@ -98,6 +139,14 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const data = Object.fromEntries(formData);
 
+  let lat: number | null = null;
+  let lng: number | null = null;
+  if (data.position && typeof data.position === 'string' && data.position.trim() !== '') {
+    const [latStr, lngStr] = data.position.split(',');
+    lat = parseFloat(latStr.trim());
+    lng = parseFloat(lngStr.trim());
+  }
+
   const order = {
     customer: data.customer as string,
     address: data.address as string,
@@ -107,6 +156,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       pizzaId: item.id,
     })),
     priority: data.priority === 'on',
+    latitude: lat,
+    longitude: lng,
   };
 
   const newOrder = await createOrder(order);

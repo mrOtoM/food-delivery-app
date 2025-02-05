@@ -1,6 +1,6 @@
 import { MenuItemTypes } from '@/types/MenuTypes';
 
-import { Order } from '@/types/OrderTypes';
+import { Order, NewOrder } from '@/types/OrderTypes';
 
 const API_URL = '';
 
@@ -21,7 +21,7 @@ export async function getOrder(id: string) {
   return data;
 }
 
-export async function createOrder(newOrder: Order) {
+export async function createOrder(newOrder: NewOrder): Promise<Order> {
   try {
     const res = await fetch(`${API_URL}/order`, {
       method: 'POST',
@@ -32,10 +32,27 @@ export async function createOrder(newOrder: Order) {
     });
 
     if (!res.ok) throw Error();
+
     const { data } = await res.json();
     return data;
   } catch {
     throw Error('Zda sa, ze sa vyskytol problem pri vytvarani objednavky');
+  }
+}
+
+export async function updateOrder(id: string, updateObj: Partial<Order>): Promise<void> {
+  try {
+    const res = await fetch(`${API_URL}/order/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(updateObj),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!res.ok) throw Error();
+  } catch (err) {
+    throw Error('Zlyhala urpava tvojej objednavky');
   }
 }
 

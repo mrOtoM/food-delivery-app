@@ -1,13 +1,23 @@
-import { useLoaderData, LoaderFunctionArgs } from 'react-router-dom';
+import { useLoaderData, LoaderFunctionArgs, useFetcher } from 'react-router-dom';
+import { useEffect } from 'react';
 
 import { calcMinutesLeft, formatCurrency, formatDate } from '@/utils/helpers';
 import { getOrder } from '@/services/apiData';
 import OrderItem from '@/features/order/OrderItem';
+import UpdateOrder from '@/features/order/UpdateOrder';
 
 import type { Order } from '@/types/OrderTypes';
 
 function Order() {
   const order = useLoaderData<Order>();
+
+  const fetcher = useFetcher();
+
+  useEffect(() => {
+    if (!fetcher.data && fetcher.state === 'idle') {
+      fetcher.load('/menu');
+    }
+  }, [fetcher]);
 
   const { id, status, priority, priorityPrice, orderPrice, estimatedDelivery, cart } = order;
 
@@ -44,7 +54,14 @@ function Order() {
 
       <ul className="divide-y divide-stone-200 border-b border-t">
         {cart.map((item) => (
-          <OrderItem item={item} key={item.id} />
+          <OrderItem
+            item={item}
+            key={item.id}
+            isLoadingIngredients={fetcher.state === 'loading'}
+            ingredients={
+              fetcher?.data?.find((el) => String(el.id) === String(item.pizzaId))?.ingredients || []
+            }
+          />
         ))}
       </ul>
 
@@ -59,13 +76,14 @@ function Order() {
         )}
         <p className="font-bold">Postovne: {formatCurrency(orderPrice + priorityPrice)}</p>
       </div>
+
+      {!priority && <UpdateOrder order={order} />}
     </div>
   );
 }
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const order = await getOrder(params.id as string);
-  console.log(order);
   return order;
 };
 
